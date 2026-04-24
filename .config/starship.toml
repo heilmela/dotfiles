@@ -1,0 +1,138 @@
+format = """
+[\ue0b6](#0A64AC)\
+$os\
+$username\
+[\ue0b4](bg:#547998 fg:#0A64AC)\
+$directory\
+[\ue0b4](fg:#547998 bg:#73daca)\
+$git_branch\
+$git_status\
+[\ue0b4](fg:#73daca bg:#7dcfff)\
+$c\
+$elixir\
+$elm\
+$golang\
+$gradle\
+$haskell\
+$java\
+$julia\
+$nodejs\
+$nim\
+$rust\
+$scala\
+$conda\
+[\ue0b4](fg:#7dcfff bg:#e0af68)\
+$docker_context\
+[\ue0b4](fg:#e0af68 bg:#275378)\
+$time\
+[\ue0b4 ](fg:#275378)\
+"""
+
+command_timeout = 1000
+
+[username]
+show_always = true
+style_user = "bg:#0A64AC fg:#CBE0F0"
+style_root = "bg:#0A64AC fg:#CBE0F0"
+format = '[$user ]($style)'
+disabled = false
+
+[os]
+style = "bg:#0A64AC fg:#CBE0F0"
+disabled = true
+
+[directory]
+style = "bg:#547998 fg:#011628"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+
+[c]
+symbol = " "
+style = "bg:#7dcfff fg:#011628"
+format = '[ $symbol ($version) ]($style)'
+
+[conda]
+symbol = " 🐍"
+style = "bg:#7dcfff fg:#011628"
+format = '[$symbol $environment ]($style)'
+
+[docker_context]
+symbol = " "
+style = "bg:#e0af68 fg:#011628"
+format = '[ $symbol $context ]($style)'
+
+[elixir]
+symbol = " "
+style = "bg:#7dcfff fg:#011628"
+format = '[ $symbol ($version) ]($style)'
+
+[elm]
+symbol = " "
+style = "bg:#7dcfff fg:#011628"
+format = '[ $symbol ($version) ]($style)'
+
+[git_branch]
+symbol = ""
+style = "bg:#73daca fg:#011628"
+format = '[ $symbol $branch ]($style)'
+
+[git_status]
+style = "bg:#73daca fg:#011628"
+format = '[$all_status$ahead_behind ]($style)'
+
+[golang]
+symbol = " "
+style = "bg:#7dcfff fg:#011628"
+format = '[ $symbol ($version) ]($style)'
+
+[gradle]
+style = "bg:#7dcfff fg:#011628"
+format = '[ $symbol ($version) ]($style)'
+
+[haskell]
+symbol = " "
+style = "bg:#7dcfff fg:#011628"
+format = '[ $symbol ($version) ]($style)'
+
+[java]
+symbol = " "
+style = "bg:#7dcfff fg:#011628"
+format = '[ $symbol ($version) ]($style)'
+
+[julia]
+symbol = " "
+style = "bg:#7dcfff fg:#011628"
+format = '[ $symbol ($version) ]($style)'
+
+[nodejs]
+symbol = ""
+style = "bg:#7dcfff fg:#011628"
+format = '[ $symbol ($version) ]($style)'
+
+[nim]
+symbol = "󰆥 "
+style = "bg:#7dcfff fg:#011628"
+format = '[ $symbol ($version) ]($style)'
+
+[rust]
+symbol = ""
+style = "bg:#7dcfff fg:#011628"
+format = '[ $symbol ($version) ]($style)'
+
+[scala]
+symbol = " "
+style = "bg:#7dcfff fg:#011628"
+format = '[ $symbol ($version) ]($style)'
+
+[time]
+disabled = false
+time_format = "%R"
+style = "bg:#275378 fg:#CBE0F0"
+format = '[ ♥ $time ]($style)'
