@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
 # setup-dotfiles.sh — idempotent dotfiles bootstrap
 # Usage: curl -fsSL https://raw.githubusercontent.com/heilmela/dotfiles/main/scripts/setup-dotfiles.sh | bash
-
-
+#
+# NOTE: This script is macOS-only. It assumes Homebrew and macOS conventions
+# (Apple Silicon paths, cask packages, etc.). Linux/WSL support is not provided.
 
 set -euo pipefail
+
+if [[ "$OSTYPE" != "darwin"* ]]; then
+  echo "✗ This script only supports macOS (detected: $OSTYPE)." >&2
+  echo "  Aborting." >&2
+  exit 1
+fi
 
 REPO_URL="https://github.com/heilmela/dotfiles.git"
 DOTFILES_DIR="$HOME/.dotfiles"
@@ -16,7 +23,7 @@ dotfiles() {
 
 echo "→ Setting up dotfiles..."
 
-# 1. Clone bare repo (idempotent: skip if already present)
+# 1. Clone bare repo
 if [ ! -d "$DOTFILES_DIR" ]; then
   echo "  Cloning bare repo to $DOTFILES_DIR"
   git clone --bare "$REPO_URL" "$DOTFILES_DIR"
@@ -46,8 +53,8 @@ fi
 # 4. Pull latest on re-runs
 dotfiles pull origin main 2>/dev/null || true
 
-# 5. macOS: install Homebrew packages
-if [[ "$OSTYPE" == "darwin"* ]] && command -v brew >/dev/null 2>&1; then
+# 5. Install Homebrew packages
+if command -v brew >/dev/null 2>&1; then
   echo "→ Installing Homebrew formulae..."
   brew install --quiet \
     neovim \
@@ -60,24 +67,28 @@ if [[ "$OSTYPE" == "darwin"* ]] && command -v brew >/dev/null 2>&1; then
   brew install --cask --quiet \
     wezterm \
     font-meslo-lg-nerd-font
+else
+  echo "✗ Homebrew not found. Install from https://brew.sh then re-run this script." >&2
+  exit 1
 fi
 
-# 6. Ensure Starship init is in shell config (idempotent: only adds if missing)
-STARSHIP_INIT='eval "$(starship init zsh)"'
-if [ -f "$HOME/.zshrc" ] && ! grep -qF "starship init" "$HOME/.zshrc"; then
-  echo "" >> "$HOME/.zshrc"
-  echo "$STARSHIP_INIT" >> "$HOME/.zshrc"
-  echo "  Added starship init to ~/.zshrc"
-fi
+# 6. Patch .zshrc with required init lines (idempotent)
+ZSHRC="$HOME/.zshrc"
+touch "$ZSHRC"
 
-# 7. Ensure dotfiles alias is in shell config (idempotent: only adds if missing)
-ALIAS_LINE="alias dotfiles='git --git-dir=\$HOME/.dotfiles --work-tree=\$HOME'"
-for rc in "$HOME/.zshrc" "$HOME/.bashrc"; do
-  if [ -f "$rc" ] && ! grep -qF "$ALIAS_LINE" "$rc"; then
-    echo "$ALIAS_LINE" >> "$rc"
-    echo "  Added dotfiles alias to $rc"
+add_to_zshrc() {
+  local marker="$1"
+  local line="$2"
+  local label="$3"
+  if ! grep -qF "$marker" "$ZSHRC"; then
+    echo "$line" >> "$ZSHRC"
+    echo "  Added $label to ~/.zshrc"
   fi
-done
+}
+
+add_to_zshrc "starship init"    'eval "$(starship init zsh)"'                                              "starship init"
+add_to_zshrc "HOMEBREW_PREFIX"  'eval "$(/opt/homebrew/bin/brew shellenv)"'                                "homebrew shellenv"
+add_to_zshrc ".dotfiles"        "alias dotfiles='git --git-dir=\$HOME/.dotfiles --work-tree=\$HOME'"       "dotfiles alias"
 
 echo "✓ Done. Restart your shell or run: source ~/.zshrc"
 echo "  Then use: dotfiles status / dotfiles add / dotfiles commit / dotfiles push"
