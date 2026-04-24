@@ -31,8 +31,7 @@ config.colors = {
 config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
 config.window_background_opacity = 0.8
 config.macos_window_background_blur = 10
-config.status_update_interval = 2000 
-
+config.status_update_interval = 2000
 
 -- Replace the get_system_info function with this:
 local function get_system_info()
@@ -114,5 +113,10 @@ config.mouse_bindings = {
 		action = act.Nop,
 	},
 }
+
+local ok, local_config = pcall(require, "wezterm_local")
+if ok then
+	local_config.apply(config, wezterm)
+end
 
 return config
