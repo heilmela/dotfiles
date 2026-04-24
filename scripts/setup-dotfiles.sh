@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # setup-dotfiles.sh — idempotent dotfiles bootstrap
-# Usage: curl -fsSL https://raw.githubusercontent.com/heilmela/dotfiles/main/setup-dotfiles.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/heilmela/dotfiles/main/scripts/setup-dotfiles.sh | bash
 
 set -euo pipefail
 
@@ -19,7 +19,7 @@ if [ ! -d "$DOTFILES_DIR" ]; then
   echo "  Cloning bare repo to $DOTFILES_DIR"
   git clone --bare "$REPO_URL" "$DOTFILES_DIR"
 else
-  echo "  Bare repo already exists, pulling latest"
+  echo "  Bare repo already exists, fetching latest"
   dotfiles fetch origin
 fi
 
@@ -44,16 +44,19 @@ fi
 # 4. Pull latest on re-runs
 dotfiles pull origin main 2>/dev/null || true
 
-# 5. Optional: install Homebrew packages (only on macOS, only if brew exists)
+# 5. macOS: install Homebrew packages
 if [[ "$OSTYPE" == "darwin"* ]] && command -v brew >/dev/null 2>&1; then
-  echo "→ Installing Homebrew packages..."
+  echo "→ Installing Homebrew formulae..."
   brew install --quiet \
     neovim \
     tree-sitter-cli \
     lua-language-server \
-    stylua \
-    wezterm
-  # Add whatever else you want here
+    stylua
+
+  echo "→ Installing Homebrew casks..."
+  brew install --cask --quiet \
+    wezterm \
+    font-meslo-lg-nerd-font
 fi
 
 # 6. Ensure dotfiles alias is in shell config (idempotent: only adds if missing)
